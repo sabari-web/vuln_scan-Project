@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SARO – Web Vulnerability Scanner</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Poppins', sans-serif;
+            box-sizing: border-box;
+        }
+        body {
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #1e293b;
+            color: #fff;
+            padding: 20px 40px;
+            text-align: center;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 32px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+        form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        button {
+            padding: 12px 20px;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #1d4ed8;
+        }
+        .result-card {
+            margin-top: 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            background-color: #fefefe;
+        }
+        .result-card h3 {
+            margin-top: 0;
+            font-size: 20px;
+        }
+        .status {
+            font-weight: bold;
+        }
+        .status.good { color: green; }
+        .status.bad { color: red; }
+        .status.warn { color: orange; }
+        ul { padding-left: 20px; }
+        a.download {
+            display: inline-block;
+            margin-top: 20px;
+            background-color: #16a34a;
+            color: white;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+        a.download:hover {
+            background-color: #15803d;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🔒 SARO – Web Vulnerability Scanner</h1>
+        <p>Scan web apps for XSS, SQL Injection, CSRF and more</p>
+    </header>
+
+    <div class="container">
+        <form method="POST">
+            <input type="text" name="url" placeholder="Enter a website URL (https://...)" required>
+            <button type="submit">Start Scan</button>
+        </form>
+
+        {% if results %}
+            <h2>🔍 Scan Results</h2>
+            {% for result in results %}
+                <div class="result-card">
+                    <h3>{{ result.url }}</h3>
+                    <p><strong>CSRF Token:</strong>
+                        {% if result.csrf %}
+                            <span class="status good">✅ Present</span>
+                        {% else %}
+                            <span class="status bad">❌ Missing</span>
+                        {% endif %}
+                    </p>
+
+                    <p><strong>XSS Issues:</strong></p>
+                    {% if result.xss %}
+                        <ul>
+                            {% for x in result.xss %}
+                                <li class="status bad">{{ x }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="status good">✅ No XSS found</p>
+                    {% endif %}
+
+                    <p><strong>SQL Injection Issues:</strong></p>
+                    {% if result.sqli %}
+                        <ul>
+                            {% for s in result.sqli %}
+                                <li class="status bad">{{ s }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="status good">✅ No SQLi found</p>
+                    {% endif %}
+
+                    {% if result.errors %}
+                        <p><strong>Errors:</strong></p>
+                        <ul>
+                            {% for e in result.errors %}
+                                <li class="status warn">{{ e }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <a href="/download" class="download">📄 Download PDF Report</a>
+        {% endif %}
+    </div>
+</body>
+</html>
